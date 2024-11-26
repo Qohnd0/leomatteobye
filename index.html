@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abschied</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: left;
+            background: linear-gradient(135deg, #ff6ec4, #7873f5, #6dd5ed, #ffffff);
+            background-size: 150% 150%;
+            animation: gradientAnimation 5s ease infinite;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .photo-collage {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            max-width: 50%;
+            padding: 10px;
+        }
+
+        .photo-collage img {
+            width: 48%;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .photo-collage img:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .text-section {
+            flex: 1;
+            max-width: 50%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .slot-machine {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .slots {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .slot {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 60px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: #fff;
+            margin: 0 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slot-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            animation: none;
+        }
+
+        .slot-symbol {
+            height: 60px;
+            text-align: center;
+            line-height: 60px;
+        }
+
+        .lever {
+            margin-top: 20px;
+        }
+
+        .lever button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .lever button:hover {
+            background-color: #34495e;
+        }
+
+        .result {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-360px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="overlay"></div>
+
+    <!-- Standort Popup -->
+    <div id="locationPopup" class="popup">
+        <h3>Erlaube den Zugriff auf deinen Standort</h3>
+        <p>Wir benötigen deinen Standort, um dir relevante Informationen anzuzeigen.</p>
+        <button id="allowLocation">Erlauben</button>
+        <button id="denyLocation">Ablehnen</button>
+    </div>
+
+    <!-- E-Mail Popup -->
+    <div id="emailPopup" class="popup">
+        <h3>Bleib in Kontakt!</h3>
+        <p>Gib deine E-Mail-Adresse ein, um auf dem Laufenden zu bleiben.</p>
+        <form action="https://docs.google.com/forms/d/e/1FAIpQLSdPQ1ff0_hK2cf9GLr48IwHDlfsI2Olr33WaGHv4n9V5ddSqw/formResponse" method="POST" target="_blank" onsubmit="closeEmailPopup()">
+            <input type="email" name="email" placeholder="Deine E-Mail-Adresse" required>
+            <button type="submit">Abschicken</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <div class="photo-collage">
+            <img src="https://i.gadgets360cdn.com/large/pepe_twitter_pepecoineth_large_1684502002664.jpg" alt="Bild 1">
+            <img src="https://insiderguides.com.au/wp-content/uploads/2019/10/137049-56.jpg" alt="Bild 2">
+            <img src="https://www.amecnews.com/wp-content/uploads/2018/06/image004-10.jpg" alt="Bild 3">
+            <img src="https://ia803405.us.archive.org/6/items/george-floyd-750px/george%20floyd750px.jpg" alt="Bild 4">
+        </div>
+        <div class="text-section">
+            <h1>Auf Wiedersehen</h1>
+            <h2>Macht's gut, Leo und Matteo!</h2>
+            <p>
+                Wir werden euch unglaublich vermissen! Es war eine wunderschöne Zeit, die wir gemeinsam verbringen durften, voller 
+                unvergesslicher Momente, Lachen und Freude. Eure Anwesenheit hat unsere Tage heller gemacht, und die Erinnerungen, 
+                die wir zusammen geschaffen haben, werden immer einen besonderen Platz in unseren Herzen haben. 
+                <br><br>
+                Von den kleinen Abenteuern im Alltag bis hin zu den großen Erlebnissen – ihr wart ein unverzichtbarer Teil unserer Gemeinschaft. 
+                Eure Energie, euer Humor und eure Herzlichkeit haben uns alle bereichert. 
+                <br><br>
+                Wir hoffen, dass ihr in Deutschland genauso herzlich empfangen werdet, wie ihr es hier wart. Nutzt die Chance, neue 
+                Herausforderungen anzunehmen und weiterhin großartige Menschen zu sein. Vergesst niemals, dass ihr hier immer ein 
+                Zuhause und Freunde habt, die euch mit offenen Armen empfangen, wann immer ihr zurückkommt.
+                <br><br>
+                Wir wünschen euch von ganzem Herzen eine sichere Heimreise, viel Erfolg bei allem, was vor euch liegt, und vor allem 
+                jede Menge Freude, Glück und Gesundheit auf eurem weiteren Weg.
+                <br><br>
+                Ihr werdet uns fehlen – aber wir sind sicher, dass unsere Wege sich eines Tages wieder kreuzen werden. Bis dahin, 
+                bleibt wie ihr seid und denkt an uns zurück!
+            </p>
+
+            <!-- Slot-Maschinen-Spiel -->
+            <div class="slot-machine">
+                <div class="slots">
+                    <div class="slot">
+                        <div class="slot-inner" id="slot1-inner">
+                            <div class="slot-symbol">🍒</div>
+                            <div class="slot-symbol">🍋</div>
+                            <div class="slot-symbol">🍉</div>
+                            <div class="slot-symbol">🍇</div>
+                            <div class="slot-symbol">⭐</div>
+                            <div class="slot-symbol">🍊</div>
+                        </div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-inner" id="slot2-inner">
+                            <div class="slot-symbol">🍒</div>
+                            <div class="slot-symbol">🍋</div>
+                            <div class="slot-symbol">🍉</div>
+                            <div class="slot-symbol">🍇</div>
+                            <div class="slot-symbol">⭐</div>
+                            <div class="slot-symbol">🍊</div>
+                        </div>
+                    </div>
+                    <div class="slot">
+                        <div class="slot-inner" id="slot3-inner">
+                            <div class="slot-symbol">🍒</div>
+                            <div class="slot-symbol">🍋</div>
+                            <div class="slot-symbol">🍉</div>
+                            <div class="slot-symbol">🍇</div>
+                            <div class="slot-symbol">⭐</div>
+                            <div class="slot-symbol">🍊</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lever">
+                    <button onclick="playSlotMachine()">🎰 Hebel ziehen</button>
+                </div>
+                <div class="result" id="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Standort Popup
+        const locationPopup = document.getElementById("locationPopup");
+        const emailPopup = document.getElementById("emailPopup");
+        const overlay = document.getElementById("overlay");
+
+        function showLocationPopup() {
+            locationPopup.style.display = "block";
+            overlay.style.display = "block";
+        }
+
+        function closeLocationPopup() {
+            locationPopup.style.display = "none";
+        }
+
+        function showEmailPopup() {
+            emailPopup.style.display = "block";
+        }
+
+        document.getElementById("allowLocation").addEventListener("click", () => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    alert(`Standort: Breitengrad ${position.coords.latitude}, Längengrad ${position.coords.longitude}`);
+                    closeLocationPopup();
+                    showEmailPopup();
+                },
+                () => {
+                    alert("Standort konnte nicht abgerufen werden.");
+                    closeLocationPopup();
+                    showEmailPopup();
+                }
+            );
+        });
+
+        document.getElementById("denyLocation").addEventListener("click", () => {
+            closeLocationPopup();
+            showEmailPopup();
+        });
+
+        function closeEmailPopup() {
+            emailPopup.style.display = "none";
+            overlay.style.display = "none";
+        }
+
+        setTimeout(showLocationPopup, 3000);
+
+        // Slot-Maschinen-Spiel
+        function playSlotMachine() {
+            const slots = [
+                document.getElementById('slot1-inner'),
+                document.getElementById('slot2-inner'),
+                document.getElementById('slot3-inner')
+            ];
+            const slotSymbols = ["🍒", "🍋", "🍉", "🍇", "⭐", "🍊"];
+
+            slots.forEach((slot, index) => {
+                slot.style.animation = 'none';
+                const randomOffset = Math.floor(Math.random() * slotSymbols.length) * -60;
+
+                setTimeout(() => {
+                    slot.style.animation = `spin ${1.5 + index * 0.5}s cubic-bezier(0.17, 0.67, 0.83, 0.67)`;
+                    setTimeout(() => {
+                        slot.style.transform = `translateY(${randomOffset}px)`;
+                    }, 1 + index * 500);
+                }, 100);
+            });
+
+            const result = document.getElementById("result");
+            setTimeout(() => {
+                result.textContent = "🎉 Die Slots haben angehalten! Sieh dir das Ergebnis an!";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
